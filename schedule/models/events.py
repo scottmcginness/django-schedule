@@ -455,4 +455,7 @@ class Occurrence(models.Model):
         return rank
 
     def __eq__(self, other):
+        if not hasattr(other, 'event'):
+            return False
         return self.event == other.event and self.original_start == other.original_start and self.original_end == other.original_end
+
