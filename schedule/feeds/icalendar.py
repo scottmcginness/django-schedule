@@ -1,5 +1,4 @@
 import vobject
-
 from django.http import HttpResponse
 
 EVENT_ITEMS = (
@@ -12,12 +11,12 @@ EVENT_ITEMS = (
     ('created', 'created'),
 )
 
-class ICalendarFeed(object):
 
+class ICalendarFeed(object):
     def __call__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
-        
+
         cal = vobject.iCalendar()
 
         for item in self.items():

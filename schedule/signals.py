@@ -1,10 +1,10 @@
 from django.db.models.signals import pre_save
-
 from models import Event, Calendar
+
 
 def optionnal_calendar(sender, **kwargs):
     event = kwargs.pop('instance')
-        
+
     if not isinstance(event, Event):
         return True
     if not event.calendar:

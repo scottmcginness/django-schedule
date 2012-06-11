@@ -1,8 +1,8 @@
-from django.utils.translation import ugettext, ugettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import ugettext, ugettext_lazy as _
 
-fdow_default = 0 # Sunday
+fdow_default = 0  # Sunday
 
 # Look for FIRST_DAY_OF_WEEK as a locale setting
 fdow = ugettext('FIRST_DAY_OF_WEEK')
