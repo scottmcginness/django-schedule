@@ -10,4 +10,4 @@
 timeslotsPerHour = 4;
 allowCalEventOverlap = true;
 firstDayOfWeek = 1;
-businessHours = {start: 8, end: 18, limitDisplay: true };
+businessHours = {start: 8, end: 18, limitDisplay: true};
