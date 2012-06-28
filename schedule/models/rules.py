@@ -1,17 +1,19 @@
+from dateutil import rrule
+
 from django.db import models
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-from dateutil import rrule
 
-RRULE_WEEKDAYS = {"MO":0,"TU":1,"WE":2,"TH":3,"FR":4,"SA":5,"SU":6}
+RRULE_WEEKDAYS = {"MO": 0, "TU": 1, "WE": 2, "TH": 3, "FR": 4, "SA": 5, "SU": 6}
 
-freqs = ( ("YEARLY", _("Yearly")),
-            ("MONTHLY", _("Monthly")),
-            ("WEEKLY", _("Weekly")),
-            ("DAILY", _("Daily")),
-            ("HOURLY", _("Hourly")),
-            ("MINUTELY", _("Minutely")),
-            ("SECONDLY", _("Secondly")))
+freqs = (("YEARLY", _("Yearly")),
+         ("MONTHLY", _("Monthly")),
+         ("WEEKLY", _("Weekly")),
+         ("DAILY", _("Daily")),
+         ("HOURLY", _("Hourly")),
+         ("MINUTELY", _("Minutely")),
+         ("SECONDLY", _("Secondly")))
+
 
 class Rule(models.Model):
     """
@@ -53,7 +55,7 @@ class Rule(models.Model):
         app_label = 'schedule'
 
     def parse_param(self, param_value):
-        param = param_value.split('(',1)[0]
+        param = param_value.split('(', 1)[0]
         if param in RRULE_WEEKDAYS:
             try:
                 return eval("rrule.%s" % param_value)
@@ -76,7 +78,7 @@ class Rule(models.Model):
         param_dict = []
         for param in params:
             if param.strip() == "":
-                continue # skip blanks
+                continue  # skip blanks
             param = param.split(':')
             if len(param) == 2:
                 param = (str(param[0]).strip(), [self.parse_param(p.strip()) for p in param[1].split(',')])
@@ -88,4 +90,3 @@ class Rule(models.Model):
     def __unicode__(self):
         """Human readable string for Rule"""
         return self.name
-

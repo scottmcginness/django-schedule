@@ -27,5 +27,5 @@ setup(
                  'Topic :: Utilities'],
     install_requires=['setuptools', 'vobject', dateutil],
     license='BSD',
-    test_suite = "schedule.tests",
+    test_suite="schedule.tests",
 )

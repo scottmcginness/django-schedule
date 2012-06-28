@@ -30,7 +30,6 @@
 
 from xml.sax.saxutils import XMLGenerator
 from datetime import datetime
-from django.contrib.syndication.views import Feed as _Feed
 
 
 GENERATOR_TEXT = 'django-atompub'
@@ -71,12 +70,15 @@ def get_tag_uri(url, date):
 
 
 ## based on django.contrib.syndication.feeds.Feed
-class Feed(_Feed):
+class Feed(object):
     
     
     VALIDATE = True
-       
-    
+
+    def __init__(self, slug, feed_url):
+        # @@@ slug and feed_url are not used yet
+        pass
+
     def __get_dynamic_attr(self, attname, obj, default=None):
         try:
             attr = getattr(self, attname)

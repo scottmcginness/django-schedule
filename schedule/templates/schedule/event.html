@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load scheduletags %}
 
-{% block body %}
+{% block content %}
 
 <div class="navigation">
   <a href="{% url day_calendar event.calendar.slug %}{% querystring_for_date event.start 3 %}">

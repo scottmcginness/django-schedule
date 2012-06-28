@@ -1,6 +1,5 @@
-
 /* TODO those function should be methods of calendar */
-function weekcal_save_event($calendar, calEvent){
+function weekcal_save_event($calendar, calEvent) {
     /* post data to the server
      * if the server returns an error we display alert
      * and reload events to get back to original values
@@ -11,43 +10,46 @@ function weekcal_save_event($calendar, calEvent){
     body = calEvent.body;
     st = format_datetime(start);
     en = format_datetime(end);
-    data = {id:calEvent.id, start:st, end:en, title:title, description:body};
-    if(calEvent.recurring == true){
+    data = {id: calEvent.id, start: st, end: en, title: title, description: body};
+    if (calEvent.recurring == true) {
         url = edit_occurrence_url;
-    }else{
+    } else {
         url = edit_event_url;
     }
-    $.post(edit_occurrence_url, data, function(data){
-        if(data.error == undefined){
+    $.post(edit_occurrence_url, data, function(data) {
+        if (data.error == undefined) {
             evt = data[0]
             calEvent.id = evt.id;
             calEvent.recurring = evt.recurring;
             calEvent.persisted = evt.persisted;
             $calendar.weekCalendar("updateEvent", calEvent);
-        }else{
+        } else {
             alert(e + data);
             $calendar.weekCalendar("refresh");
         }
     }, 'json');
 }
 
-
-function format_time(dt){
-    if(dt==undefined) return '';
+function format_time(dt) {
+    if (dt == undefined) {
+        return '';
+    }
     return lead_zero(dt.getHours()) + ":" + lead_zero(dt.getMinutes());
 }
 
-function format_date(dt){
-    if(dt==undefined) return '';
+function format_date(dt) {
+    if (dt == undefined) {
+        return '';
+    }
     return dt.getFullYear() + '-' + lead_zero(dt.getMonth()+1) + '-' + lead_zero(dt.getDate());
 }
 
-function parse_date(s){
+function parse_date(s) {
     s = s.split('-');
     return new Date(parseInt(s[0]), parseInt(s[1], 10)-1, parseInt(s[2], 10));
 }
 
-function dateplustime(d, t){
+function dateplustime(d, t) {
     var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     dt.setHours(t.getHours());
     dt.setMinutes(t.getMinutes());
@@ -56,39 +58,38 @@ function dateplustime(d, t){
 }
 
 $(document).ready(function() {
-
     var $calendar = $('#calendar');
 
     $calendar.weekCalendar({
          /* TODO input parameters dynamically from settings */
-        timeslotsPerHour : timeslotsPerHour,
-        allowCalEventOverlap : allowCalEventOverlap,
-        firstDayOfWeek : firstDayOfWeek,
-        businessHours :businessHours,
-        height : function($calendar) {
+        timeslotsPerHour: timeslotsPerHour,
+        allowCalEventOverlap: allowCalEventOverlap,
+        firstDayOfWeek: firstDayOfWeek,
+        businessHours: businessHours,
+        height: function($calendar) {
             return $(window).height() - $("h1").outerHeight();
         },
-        eventRender : function(calEvent, $event) {
+        eventRender: function(calEvent, $event) {
             if (calEvent.end.getTime() < new Date().getTime()) {
                 /* past events grayed out */
                 $event.attr("class", $event.attr("class") + " pastEvent");
             }
-            if((calEvent.recurring) && !(calEvent.persisted)){
+            if ((calEvent.recurring) && !(calEvent.persisted)) {
                 /* mark those which are parts of a recurrence chain */
                 $event.attr("class", $event.attr("class") + " partOfChain");
             }
-            if(calEvent.readOnly){
+            if (calEvent.readOnly) {
                 $event.css("cursor", "default");
             }
         },
-        draggable : function(calEvent, $event) {
+        draggable: function(calEvent, $event) {
             return calEvent.readOnly != true;
         },
-        resizable : function(calEvent, $event) {
+        resizable: function(calEvent, $event) {
             return calEvent.readOnly != true;
         },
-        eventNew : function(calEvent, $event) {
-            if(!user_is_authenticated){
+        eventNew: function(calEvent, $event) {
+            if (!user_is_authenticated) {
                 alert("You must be logged in to create events");
                 $calendar.weekCalendar("removeUnsavedEvents");
                 return;
@@ -99,8 +100,16 @@ $(document).ready(function() {
             var endField =  $dialogContent.find("select[name='end']").val(calEvent.end);
             var titleField = $dialogContent.find("input[name='title']");
             var bodyField = $dialogContent.find("textarea[name='body']");
-            var endRecPeriodField = $dialogContent.find("input[name='end_recurring_period']").datepicker({showOn:'both', buttonText:'choose', dateFormat:'yy-mm-dd'});
-            var startDateField = $dialogContent.find("input[name='start_date']").datepicker({showOn:'both', buttonText:'choose', dateFormat:'yy-mm-dd'})
+            var endRecPeriodField = $dialogContent.find("input[name='end_recurring_period']").datepicker({
+                showOn: 'both',
+                buttonText: 'choose',
+                dateFormat:'yy-mm-dd'
+            });
+            var startDateField = $dialogContent.find("input[name='start_date']").datepicker({
+                showOn: 'both',
+                buttonText: 'choose',
+                dateFormat:'yy-mm-dd'
+            })
             $dialogContent.find("input[name='start_date']").val(format_date(calEvent.start));
 
             var ruleField = $dialogContent.find("select[name='rule']")
@@ -113,8 +122,7 @@ $(document).ready(function() {
                     $('#calendar').weekCalendar("removeUnsavedEvents");
                 },
                 buttons: {
-                    save : function(){
-
+                    save: function() {
                         start_date = parse_date(startDateField.val());
                         start_time = new Date(startField.val());
                         start = dateplustime(start_date, start_time);
@@ -131,93 +139,99 @@ $(document).ready(function() {
 
                         st = format_datetime(start);
                         en = format_datetime(end);
-                        data = {start:st, end:en, title:title, description:body,
-                            end_recurring_period:calEvent.end_recurring_period,
-                            rule:calEvent.rule};
-                        $.post(edit_event_url, data, function(data){
-                            if(data.error == undefined){
+                        data = {
+                            start: st,
+                            end: en,
+                            title: title,
+                            description: body,
+                            end_recurring_period: calEvent.end_recurring_period,
+                            rule: calEvent.rule
+                        };
+                        $.post(edit_event_url, data, function(data) {
+                            if (data.error == undefined) {
                                 evt = data[0]
                                 calEvent.id = evt.id;
                                 calEvent.recurring = evt.recurring;
                                 calEvent.persisted = evt.persisted;
-                                if(calEvent.recurring){
+
+                                if (calEvent.recurring) {
                                     // we have to reload all events becase we don't
                                     // know how many occurrences there is going to be
                                     $calendar.weekCalendar("refresh");
-                                }else{
+                                } else {
                                     $calendar.weekCalendar("removeUnsavedEvents");
                                     $calendar.weekCalendar("updateEvent", calEvent);
                                 }
                                 $dialogContent.dialog("close");
-                            }else{
+                            } else {
                                 alert(data.error);
                             }
                         }, 'json');
                     },
-                    cancel : function(){
+                    cancel: function() {
                         $dialogContent.dialog("close");
                     }
                 }
             }).show();
             $dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
             setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
-            $(window).resize().resize(); //fixes a bug in modal overlay size ??
+            $(window).resize().resize(); // fixes a bug in modal overlay size ??
         },
 
-        eventDrop : function(calEvent, $event) {
+        eventDrop: function(calEvent, $event) {
             weekcal_save_event($calendar, calEvent);
         },
 
-        eventResize : function(calEvent, $event) {
+        eventResize: function(calEvent, $event) {
             weekcal_save_event($calendar, calEvent);
         },
 
-        eventClick : function(calEvent, $event) {
-            if(calEvent.readOnly == true){
+        eventClick: function(calEvent, $event) {
+            if (calEvent.readOnly == true) {
                 return;
             }
-            if(calEvent.recurring){
-                if(calEvent.persisted){
+            if (calEvent.recurring) {
+                if (calEvent.persisted) {
                     editOccurrence(calEvent, $event);
-                }else{
+                } else {
                     $("#editing_choice_dialog").dialog({
                         modal:true,
-                        buttons:{
-                            All:function(){
+                        buttons: {
+                            All: function() {
                                 $("#editing_choice_dialog").dialog("destroy");
                                 editEvent(calEvent, $event);
                             },
-                            This:function(){
+                            This: function() {
                                 $("#editing_choice_dialog").dialog("destroy");
                                 editOccurrence(calEvent, $event);
                             },
-                            Cancel:function(){
+                            Cancel: function() {
                                 $("#editing_choice_dialog").dialog("destroy");
                             }
                         }
                     }).show();
                 }
-            }else{
+            } else {
                 editEvent(calEvent, $event);
             }
         },
 
-        eventMouseover : function(calEvent, $event) {
+        eventMouseover: function(calEvent, $event) {
             /* TODO: show tooltip with detailed info */
         },
 
-        eventMouseout : function(calEvent, $event) {
+        eventMouseout: function(calEvent, $event) {
         },
 
-        noEvents : function() {
+        noEvents: function() {
         },
 
-        data : function(start, end, callback) {
+        data: function(start, end, callback) {
             /* this is called (a) upon page load and (b) when week is changed
-            * start and end are beginning/end of selected week */
+             * start and end are beginning/end of selected week */
             var url = get_week_occurrences_url + '?year=' + start.getFullYear() + '&month=' + (start.getMonth() + 1) + '&day=' + start.getDate();
-            $.getJSON(url, function(data){
-                res = {events:data};
+            $.getJSON(url, function(data) {
+                res = {events: data};
                 callback(res);
             });
         }
@@ -229,7 +243,7 @@ $(document).ready(function() {
         var $dialogContent = $("#event_edit_container");
         resetForm($dialogContent);
         var url = get_event_url + '?event_id=' + calEvent.event_id;
-        $.getJSON(url, function(data){
+        $.getJSON(url, function(data) {
             calEvent = data[0];
             var startField = $dialogContent.find("select[name='start']");
             var endField =  $dialogContent.find("select[name='end']");
@@ -248,38 +262,45 @@ $(document).ready(function() {
                     $('#calendar').weekCalendar("removeUnsavedEvents");
                 },
                 buttons: {
-                save : function(){
-                    /* send new data to the server; if response is OK
-                    * then update calendar and close dialog */
-                    start_time = new Date(startField.val());
-                    end_time = new Date(endField.val());
-                    start_date = parse_date(startDateField.val());
-                    start = dateplustime(start_date, start_time);
-                    end = dateplustime(start_date, end_time);
-                    title = titleField.val();
-                    body = bodyField.val();
-                    st = format_datetime(start);
-                    en = format_datetime(end);
-                    end_recurring_period = endRecPeriodField.val();
-                    rule = ruleField.val()
-                    data = {id:calEvent.id, start:st, end:en, title:title, description:body,
-                        end_recurring_period:end_recurring_period, rule:rule};
-                    $.post(edit_event_url, data, function(data){
-                        if(data.error == undefined){
-                            $calendar.weekCalendar("refresh");
-                            $dialogContent.dialog("close");
-                        }else{
-                            alert(data.error);
-                        }
-                    }, 'json');
-                    },
-                    "delete" : function(){
-                        data = {id:calEvent.id, action:"cancel"};
-                        $.post(edit_event_url, data, function(data){
-                            if(data.error == undefined){
+                    save: function() {
+                        /* send new data to the server; if response is OK
+                         * then update calendar and close dialog */
+                        start_time = new Date(startField.val());
+                        end_time = new Date(endField.val());
+                        start_date = parse_date(startDateField.val());
+                        start = dateplustime(start_date, start_time);
+                        end = dateplustime(start_date, end_time);
+                        title = titleField.val();
+                        body = bodyField.val();
+                        st = format_datetime(start);
+                        en = format_datetime(end);
+                        end_recurring_period = endRecPeriodField.val();
+                        rule = ruleField.val();
+                        data = {
+                            id: calEvent.id,
+                            start: st,
+                            end: en,
+                            title: title,
+                            description: body,
+                            end_recurring_period: end_recurring_period,
+                            rule: rule
+                        };
+                        $.post(edit_event_url, data, function(data) {
+                            if (data.error == undefined) {
                                 $calendar.weekCalendar("refresh");
                                 $dialogContent.dialog("close");
-                            }else{
+                            } else {
+                                alert(data.error);
+                            }
+                        }, 'json');
+                    },
+                    "delete" : function() {
+                        data = {id: calEvent.id, action: "cancel"};
+                        $.post(edit_event_url, data, function(data) {
+                            if (data.error == undefined) {
+                                $calendar.weekCalendar("refresh");
+                                $dialogContent.dialog("close");
+                            } else {
                                 alert(data.error);
                             }
                         });
@@ -290,14 +311,22 @@ $(document).ready(function() {
                 }
             }).show();
 
-            startDateField.datepicker({showOn:'both', buttonText:'choose', dateFormat:'yy-mm-dd'})
+            startDateField.datepicker({
+                showOn: 'both',
+                buttonText: 'choose',
+                dateFormat: 'yy-mm-dd'
+            })
             startDateField.val(format_date(calEvent.start));
-            endRecPeriodField.datepicker({showOn:'both', buttonText:'choose', dateFormat:'yy-mm-dd'})
+            endRecPeriodField.datepicker({
+                showOn: 'both',
+                buttonText: 'choose',
+                dateFormat:'yy-mm-dd'
+            })
             endRecPeriodField.val(format_date(calEvent.end_recurring_period));
             startField.val(calEvent.start);
             endField.val(calEvent.end);
             setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
-            $(window).resize().resize(); //fixes a bug in modal overlay size ??
+            $(window).resize().resize(); // fixes a bug in modal overlay size ??
         });
     }
 
@@ -319,45 +348,51 @@ $(document).ready(function() {
                 $('#calendar').weekCalendar("removeUnsavedEvents");
             },
             buttons: {
-            save : function(){
-                /* send new data to the server; if response is OK
-                * then update calendar and close dialog */
-                start = new Date(startField.val());
-                end = new Date(endField.val());
-                title = titleField.val();
-                body = bodyField.val();
-                st = format_datetime(start);
-                en = format_datetime(end);
-                data = {id:calEvent.id, start:st, end:en, title:title, description:body};
-                $.post(edit_occurrence_url, data, function(data){
-                    if(data.error == undefined){
-                        evt = data[0];
-                        calEvent.id = evt['id'];
-                        calEvent.start = start;
-                        calEvent.end = end;
-                        calEvent.title = title;
-                        calEvent.body = body;
-                        calEvent.recurring = evt.recurring;
-                        calEvent.persisted = evt.persisted;
-                        $calendar.weekCalendar("updateEvent", calEvent);
-                        $dialogContent.dialog("close");
-                    }else{
-                        alert(data.error);
-                    }
-                }, 'json');
+                save: function() {
+                    /* send new data to the server; if response is OK
+                     * then update calendar and close dialog */
+                    start = new Date(startField.val());
+                    end = new Date(endField.val());
+                    title = titleField.val();
+                    body = bodyField.val();
+                    st = format_datetime(start);
+                    en = format_datetime(end);
+                    data = {
+                        id: calEvent.id,
+                        start: st,
+                        end: en,
+                        title: title,
+                        description: body
+                    };
+                    $.post(edit_occurrence_url, data, function(data) {
+                        if (data.error == undefined) {
+                            evt = data[0];
+                            calEvent.id = evt['id'];
+                            calEvent.start = start;
+                            calEvent.end = end;
+                            calEvent.title = title;
+                            calEvent.body = body;
+                            calEvent.recurring = evt.recurring;
+                            calEvent.persisted = evt.persisted;
+                            $calendar.weekCalendar("updateEvent", calEvent);
+                            $dialogContent.dialog("close");
+                        } else {
+                            alert(data.error);
+                        }
+                    }, 'json');
                 },
-                "delete" : function(){
-                    data = {id:calEvent.id, action:"cancel"};
-                    $.post(edit_occurrence_url, data, function(data){
-                        if(data.error == undefined){
+                "delete": function() {
+                    data = {id: calEvent.id, action: "cancel"};
+                    $.post(edit_occurrence_url, data, function(data) {
+                        if (data.error == undefined) {
                             $calendar.weekCalendar("removeEvent", calEvent.id);
                             $dialogContent.dialog("close");
-                        }else{
+                        } else {
                             alert(data.error);
                         }
                     });
                 },
-                cancel : function(){
+                cancel : function() {
                     $dialogContent.dialog("close");
                 }
             }
@@ -367,7 +402,7 @@ $(document).ready(function() {
         endField =  $dialogContent.find("select[name='end']").val(calEvent.end);
         $dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
         setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
-        $(window).resize().resize(); //fixes a bug in modal overlay size ??
+        $(window).resize().resize(); // fixes a bug in modal overlay size ??
     }
     
     function resetForm($dialogContent) {
@@ -381,23 +416,21 @@ $(document).ready(function() {
         var day = new Date().getDate();
 
         return {
-            events : [
-            {"id":1, "start": new Date(year, month, day, 12), "end": new Date(year, month, day, 13, 30),"title":"Lunch with Mike"},
-            {"id":2, "start": new Date(year, month, day, 14), "end": new Date(year, month, day, 14, 45),"title":"Dev Meeting"},
-            {"id":3, "start": new Date(year, month, day + 1, 17), "end": new Date(year, month, day + 1, 17, 45),"title":"Hair cut"},
-            {"id":4, "start": new Date(year, month, day - 1, 8), "end": new Date(year, month, day - 1, 9, 30),"title":"Team breakfast"},
-            {"id":5, "start": new Date(year, month, day + 1, 14), "end": new Date(year, month, day + 1, 15),"title":"Product showcase"},
-            {"id":6, "start": new Date(year, month, day, 10), "end": new Date(year, month, day, 11),"title":"I'm read-only", readOnly : true}
-
+            events: [
+                {"id": 1, "start": new Date(year, month, day, 12), "end": new Date(year, month, day, 13, 30), "title": "Lunch with Mike"},
+                {"id": 2, "start": new Date(year, month, day, 14), "end": new Date(year, month, day, 14, 45), "title": "Dev Meeting"},
+                {"id": 3, "start": new Date(year, month, day + 1, 17), "end": new Date(year, month, day + 1, 17, 45), "title": "Hair cut"},
+                {"id": 4, "start": new Date(year, month, day - 1, 8), "end": new Date(year, month, day - 1, 9, 30), "title": "Team breakfast"},
+                {"id": 5, "start": new Date(year, month, day + 1, 14), "end": new Date(year, month, day + 1, 15), "title": "Product showcase"},
+                {"id": 6, "start": new Date(year, month, day, 10), "end": new Date(year, month, day, 11), "title": "I'm read-only", readOnly: true}
             ]
         };
     }
 
-
     /*
-    * Sets up the start and end time fields in the calendar event
-    * form for editing based on the calendar event being edited
-    */
+     * Sets up the start and end time fields in the calendar event
+     * form for editing based on the calendar event being edited
+     */
     function setupStartAndEndTimeFields($startTimeField, $endTimeField, calEvent, timeslotTimes) {
         // TODO optimize - we don't need to recreate options every time
         $startTimeField.empty();
@@ -406,25 +439,25 @@ $(document).ready(function() {
         var event_end = calEvent.end.getTime();
         var have_start = false;
         var have_end = false;
-        for(var i=0; i<timeslotTimes.length; i++) {
+        for (var i=0; i<timeslotTimes.length; i++) {
             var startTime = timeslotTimes[i].start;
             var endTime = timeslotTimes[i].end;
             var startSelected = "";
-            if(!have_start){
-                if(startTime.getTime() >= event_start) {
-                    startSelected = "selected=\"selected\"";
+            if (!have_start) {
+                if (startTime.getTime() >= event_start) {
+                    startSelected = 'selected="selected"';
                     have_start = true;
                 }
             }
             var endSelected = "";
-            if(!have_end){
-                if(endTime.getTime() >= event_end) {
-                    endSelected = "selected=\"selected\"";
+            if (!have_end) {
+                if (endTime.getTime() >= event_end) {
+                    endSelected = 'selected="selected"';
                     have_end = true;
                 }
             }
-            $startTimeField.append("<option value=\"" + startTime + "\" " + startSelected + ">" + timeslotTimes[i].startFormatted + "</option>");
-            $endTimeField.append("<option value=\"" + endTime + "\" " + endSelected + ">" + timeslotTimes[i].endFormatted + "</option>");
+            $startTimeField.append('<option value="' + startTime + '" ' + startSelected + '>' + timeslotTimes[i].startFormatted + '</option>');
+            $endTimeField.append('<option value="' + endTime + '" ' + endSelected + '>' + timeslotTimes[i].endFormatted + '</option>');
         }
         $endTimeOptions = $endTimeField.find("option");
         $startTimeField.trigger("change");
@@ -434,18 +467,16 @@ $(document).ready(function() {
     var $endTimeOptions;// = $endTimeField.find("option");
 
     //reduces the end time options to be only after the start time options.
-    $("select[name='start']").change(function(){
+    $("select[name='start']").change(function() {
         var startTime = $(this).find(":selected").val();
         var currentEndTime = $endTimeField.val();
-        $endTimeField.html(
-            $endTimeOptions.filter(function(){
-                return startTime < $(this).val();
-            })
-        );
+        $endTimeField.html($endTimeOptions.filter(function() {
+            return startTime < $(this).val();
+        }));
         var endTimeSelected = false;
         // TODO this loop can probably be eliminated too
         $endTimeOptions.each(function() {
-            if($(this).val() == currentEndTime) {
+            if ($(this).val() == currentEndTime) {
                 $endTimeField.val(currentEndTime);
                 endTimeSelected = true;
                 return false;
@@ -453,23 +484,21 @@ $(document).ready(function() {
             return true;
         });
 
-        if(!endTimeSelected) {
+        if (!endTimeSelected) {
             //automatically select an end date 2 slots away.
             $endTimeField.find("option:eq(1)").attr("selected", "selected");
         }
 
     });
 
-
     var $about = $("#about");
 
-
     {% if periods.week.start %}
-    /* jump to initial date */
-    var year = {{periods.week.start.year}};
-    var month = {{periods.week.start.month}} - 1; /* we count from 1 */
-    var day = {{periods.week.start.day}};
-    var initial_date = new Date(year, month, day);
-    $calendar.weekCalendar("gotoWeek", initial_date);
+        /* jump to initial date */
+        var year = {{ periods.week.start.year }};
+        var month = {{ periods.week.start.month }} - 1; /* we count from 1 */
+        var day = {{ periods.week.start.day }};
+        var initial_date = new Date(year, month, day);
+        $calendar.weekCalendar("gotoWeek", initial_date);
     {% endif %}
 });
