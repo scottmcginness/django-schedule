@@ -195,10 +195,30 @@ def prev_url(target, slug, period):
 
 
 @register.simple_tag
+def prev_urls(target, slug, period, number=3):
+    urls = []
+    p = period
+    for i in range(number):
+        urls.append(prev_url(target, slug, p))
+        p = p.prev()
+    return urls
+
+
+@register.simple_tag
 def next_url(target, slug, period):
     url = reverse(target, kwargs=dict(calendar_slug=slug))
     qs = querystring_for_date(period.next().start)
     return '%s%s' % (url, qs)
+
+
+@register.simple_tag
+def next_urls(target, slug, period, number=3):
+    urls = []
+    p = period
+    for i in range(number):
+        urls.append(next_url(target, slug, p))
+        p = p.next()
+    return urls
 
 
 @register.inclusion_tag("schedule/_prevnext.html")
@@ -209,7 +229,7 @@ def prevnext(target, slug, period, fmt=None):
         'MEDIA_URL': getattr(settings, 'MEDIA_URL', ''),
         'slug': slug,
         'period': period,
-        'period_name': format(period.start, fmt),
+        'fmt': fmt,
         'target': target,
         'MEDIA_URL': settings.MEDIA_URL,
     }
