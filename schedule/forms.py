@@ -53,7 +53,7 @@ class EventBackendForm(SpanForm):
 
 
 class RuleForm(forms.ModelForm):
-    params = forms.CharField(widget=forms.Textarea, help_text=_("Extra parameters to define this type of recursion. Should follow this format: rruleparam:value;otherparam:value."))
+    params = forms.CharField(widget=forms.Textarea, required=False, help_text=_("Extra parameters to define this type of recursion. Should follow this format: rruleparam:value;otherparam:value."))
 
     def clean_params(self):
         params = self.cleaned_data["params"]
