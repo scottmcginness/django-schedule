@@ -3,10 +3,10 @@
 
 {% block extra_head %}
   {{ block.super }}
-  <link rel="stylesheet" href="{{ MEDIA_URL }}css/jquery.weekcalendar.css" type="text/css" media="screen" />
-  <link rel="stylesheet" href="{{ MEDIA_URL }}css/weekcalendar.css" type="text/css" media="screen" />
-  <link rel="stylesheet" href="{{ MEDIA_URL }}css/schedule_weekcalendar.css" type="text/css" media="screen" />
-  <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.weekcalendar.js"></script>
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.weekcalendar.css" type="text/css" media="screen" />
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/weekcalendar.css" type="text/css" media="screen" />
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/schedule_weekcalendar.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.weekcalendar.js"></script>
   <script type="text/javascript">
     {% include "schedule/schedule_lib.js" %}
   </script>

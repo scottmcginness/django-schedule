@@ -18,5 +18,5 @@ if settings.DEBUG:
     urlpatterns += patterns(
         '',
         url(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+            {'document_root': settings.STATIC_URL, 'show_indexes': True}),
     )
