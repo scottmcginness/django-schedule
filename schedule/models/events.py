@@ -25,6 +25,14 @@ class Category(models.Model):
         verbose_name_plural = _('categories')
         app_label = 'schedule'
 
+    def __unicode__(self):
+        title = _("<Untitled>")
+        if self.title:
+            title = self.title
+        return ugettext("%(title)s") % {
+            'title': title,
+        }
+
 
 class EventManager(models.Manager):
     def get_for_object(self, content_object, distinction=None, inherit=True):
