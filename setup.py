@@ -9,11 +9,11 @@ if sys.version_info < (3, 0):
 
 setup(
     name='django-schedule',
-    version='0.5b',
+    version='0.6b',
     description='A calendaring app for Django.',
     author='Anthony Robert Hauber',
     author_email='thauber@gmail.com',
-    url='http://github.com/thauber/django-schedule/tree/master',
+    url='http://github.com/scottmcginness/django-schedule/tree/master',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
