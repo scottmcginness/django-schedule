@@ -396,10 +396,11 @@ class Occurrence(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Occurrence, self).__init__(*args, **kwargs)
-        if self.title is None:
-            self.title = self.event.title
-        if self.description is None:
-            self.description = self.event.description
+        try:
+            self.title = self.title or self.event.title
+            self.description = self.description or self.event.description
+        except Event.DoesNotExist:
+            pass
 
     def moved(self):
         return self.original_start != self.start or self.original_end != self.end
