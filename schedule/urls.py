@@ -5,7 +5,7 @@ from schedule.feeds import UpcomingEventsFeed, CalendarICalendar
 from schedule.models import Calendar
 from schedule.feeds import UpcomingEventsFeed
 from schedule.feeds import CalendarICalendar
-from schedule.periods import Year, Month, Week, Day
+from schedule.periods import Decade, Year, Month, Week, Day
 
 urlpatterns = patterns('')
 
@@ -15,6 +15,12 @@ urlpatterns += patterns('',
         kwargs={
             'queryset': Calendar.objects.all(),
             'template_name': 'schedule/calendar_list.html'}),
+
+    url(r'^calendar/decade/(?P<calendar_slug>[-\w]+)/$',
+        'schedule.views.calendar_by_periods', name="decade_calendar",
+        kwargs={
+            'periods': [Decade],
+            'template_name': 'schedule/calendar_decade.html'}),
 
     url(r'^calendar/year/(?P<calendar_slug>[-\w]+)/$',
         'schedule.views.calendar_by_periods', name="year_calendar",

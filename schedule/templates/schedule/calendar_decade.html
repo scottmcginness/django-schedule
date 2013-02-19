@@ -1,0 +1,44 @@
+{% extends "schedule/base.html" %}
+{% load scheduletags %}
+
+{% block content %}
+  <div class="tablewrapper">
+    <div class="calendarname">
+      {{ calendar.name }}
+    </div>
+    {% prevnext "decade_calendar" calendar.slug periods.decade "Y\s" %}
+    <table align="center">
+      <tr>
+        {% for year in periods.decade.get_years %}
+          <td valign="top">
+            <a href="{% url year_calendar calendar.slug %}{% querystring_for_date year.start 2 %}">
+              {{ year }}
+            </a>
+          </td>
+          <td width="12">&nbsp;</td>
+          {% ifequal forloop.counter 3  %}
+            </tr>
+            <tr>
+          {% endifequal %}
+          {% ifequal forloop.counter 6  %}
+            </tr>
+            <tr>
+          {% endifequal %}
+          {% ifequal forloop.counter  9 %}
+            </tr>
+            <tr>
+          {% endifequal %}
+        {% endfor %}
+      </tr>
+    </table>
+  </div>
+
+  <div class="navigation">
+      <a href="{% url month_calendar calendar.slug %}">
+      Current Month Calendar
+    </a>
+    <a href="{% url year_calendar calendar.slug %}">
+      Current Year Calendar
+    </a>
+  </div>
+{% endblock %}
