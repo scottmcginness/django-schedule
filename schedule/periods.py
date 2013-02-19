@@ -138,12 +138,49 @@ class Period(object):
             period = period.next()
 
 
+class Decade(Period):
+    def __init__(self, events, date=None,
+                 parent_persisted_occurrences=None, occurrence_pool=None):
+        if date is None:
+            date = datetime.datetime.now()
+        start, end = self._get_decade_range(date)
+        super(Decade, self).__init__(
+            events, start, end,
+            parent_persisted_occurrences, occurrence_pool)
+
+    def get_years(self):
+        return self.get_periods(Year)
+
+    def next_decade(self):
+        return Decade(self.events, self.end)
+    next = next_decade
+
+    def prev_decade(self):
+        start = datetime.datetime(self.start.year - 10, self.start.month, self.start.day)
+        return Decade(self.events, start)
+    prev = prev_decade
+
+    def _get_decade_range(self, date):
+        y = 10 * (date.year // 10)
+        m = datetime.datetime.min.month
+        d = datetime.datetime.min.day
+        start = datetime.datetime(y, m, d)
+        end = datetime.datetime(y + 10, m, d)
+        return start, end
+
+    def __unicode__(self):
+        return self.start.strftime('%Ys')
+
+
 class Year(Period):
-    def __init__(self, events, date=None, parent_persisted_occurrences=None):
+    def __init__(self, events, date=None,
+                 parent_persisted_occurrences=None, occurrence_pool=None):
         if date is None:
             date = datetime.datetime.now()
         start, end = self._get_year_range(date)
-        super(Year, self).__init__(events, start, end, parent_persisted_occurrences)
+        super(Year, self).__init__(
+            events, start, end,
+            parent_persisted_occurrences, occurrence_pool)
 
     def get_months(self):
         return self.get_periods(Month)
