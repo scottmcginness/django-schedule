@@ -29,6 +29,13 @@ def month_table(context, calendar, month, size="regular", shift=None):
     return context
 
 
+@register.inclusion_tag("schedule/_year_table.html", takes_context=True)
+def year_table(context, calendar, year):
+    context['calendar'] = calendar
+    context['year'] = year
+    return context
+
+
 @register.inclusion_tag("schedule/_day_cell.html", takes_context=True)
 def day_cell(context, calendar, day, month, size="regular"):
     context.update({

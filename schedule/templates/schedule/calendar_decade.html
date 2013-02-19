@@ -8,25 +8,26 @@
     </div>
     {% prevnext "decade_calendar" calendar.slug periods.decade "Y\s" %}
     <table align="center">
-      <tr>
+      <tr class="years-row-wide">
         {% for year in periods.decade.get_years %}
           <td valign="top">
             <a href="{% url year_calendar calendar.slug %}{% querystring_for_date year.start 2 %}">
               {{ year }}
             </a>
+            {% year_table calendar year %}
           </td>
           <td width="12">&nbsp;</td>
           {% ifequal forloop.counter 3  %}
             </tr>
-            <tr>
+            <tr class="years-row-thin">
           {% endifequal %}
-          {% ifequal forloop.counter 6  %}
+          {% ifequal forloop.counter 5  %}
             </tr>
-            <tr>
+            <tr class="years-row-wide">
           {% endifequal %}
-          {% ifequal forloop.counter  9 %}
+          {% ifequal forloop.counter  8 %}
             </tr>
-            <tr>
+            <tr class="years-row-thin">
           {% endifequal %}
         {% endfor %}
       </tr>

@@ -66,6 +66,11 @@ td.daynumber div.daycell .eventcell3 {
   margin-left: -1px;
 }
 
+.years-row-thin > td {
+    position: relative;
+    left: 80px;
+}
+
 div.type0 {
   border-bottom: 4px dotted gray;
 }

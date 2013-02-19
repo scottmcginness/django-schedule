@@ -1,0 +1,26 @@
+{% load scheduletags %}
+
+<table align="center" class="calendar">
+  <tr>
+  {% for month in year.get_months %}
+  <td class="daynumber small {% if month.has_occurrences %}busy{% else %}free{% endif %}">
+      <a href="{% url month_calendar calendar.slug %}{% querystring_for_date month.start 2 %}">
+          {{ month.start|date:"M" }}
+      </a>
+    </td>
+    {% ifequal forloop.counter 4  %}
+      </tr>
+      <tr>
+    {% endifequal %}
+    {% ifequal forloop.counter 8  %}
+      </tr>
+      <tr>
+    {% endifequal %}
+    {% ifequal forloop.counter 12 %}
+      </tr>
+      <tr>
+    {% endifequal %}
+  {% endfor %}
+  </tr>
+</table>
+
