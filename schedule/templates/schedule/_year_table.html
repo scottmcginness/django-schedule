@@ -4,7 +4,7 @@
   <tr>
   {% for month in year.get_months %}
   <td class="daynumber small {% if month.has_occurrences %}busy{% else %}free{% endif %}">
-      <a href="{% url month_calendar calendar.slug %}{% querystring_for_date month.start 2 %}">
+      <a href="{% url 'month_calendar' calendar.slug %}{% querystring_for_date month.start 2 %}">
           {{ month.start|date:"M" }}
       </a>
     </td>

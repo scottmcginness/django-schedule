@@ -11,7 +11,7 @@
       <tr class="years-row-wide">
         {% for year in periods.decade.get_years %}
           <td valign="top">
-            <a href="{% url year_calendar calendar.slug %}{% querystring_for_date year.start 2 %}">
+            <a href="{% url 'year_calendar' calendar.slug %}{% querystring_for_date year.start 2 %}">
               {{ year }}
             </a>
             {% year_table calendar year %}
@@ -35,10 +35,10 @@
   </div>
 
   <div class="navigation">
-      <a href="{% url month_calendar calendar.slug %}">
+      <a href="{% url 'month_calendar' calendar.slug %}">
       Current Month Calendar
     </a>
-    <a href="{% url year_calendar calendar.slug %}">
+    <a href="{% url 'year_calendar' calendar.slug %}">
       Current Year Calendar
     </a>
   </div>

@@ -20,10 +20,10 @@
 
 {% block content %}
   <div class="navigation">
-    <a href="{% url month_calendar calendar.slug %}{% querystring_for_date periods.week.start 2 %}">
+    <a href="{% url 'month_calendar' calendar.slug %}{% querystring_for_date periods.week.start 2 %}">
       Month
     </a>
-    <a href="{% url year_calendar calendar.slug %}{% querystring_for_date periods.week.start 1%}">
+    <a href="{% url 'year_calendar' calendar.slug %}{% querystring_for_date periods.week.start 1%}">
       Year
     </a>
   </div>
