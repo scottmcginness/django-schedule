@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context, loader
 from django.views.generic.create_update import delete_object
+from django.utils import timezone
 
 from schedule.conf.settings import GET_EVENTS_FUNC, OCCURRENCE_CANCEL_REDIRECT
 from schedule.forms import (EventForm, OccurrenceForm,
@@ -74,13 +75,14 @@ def calendar_by_periods(request, calendar_slug, periods=None,
     extra_context = extra_context or {}
     calendar = get_object_or_404(Calendar, slug=calendar_slug)
     date = coerce_date_dict(request.GET)
+    tzinfo = request.session.get('django_timezone', pytz.utc)
     if date:
         try:
-            date = datetime.datetime(**date)
+            date = datetime.datetime(tzinfo=tzinfo, **date)
         except ValueError:
             raise Http404
     else:
-        date = datetime.datetime.now()
+        date = timezone.now()
     event_list = GET_EVENTS_FUNC(request, calendar)
     period_objects = dict([(period.__name__.lower(), period(event_list, date)) for period in periods])
     context = {
@@ -141,7 +143,8 @@ def occurrence(request, event_id, template_name="schedule/occurrence.html",
         the url from which this request was refered
     """
     extra_context = kwargs.get('extra_context', None) or {}
-    event, occurrence = get_occurrence(event_id, *args, **kwargs)
+    timezone = request.GET.get('timezone', pytz.utc)
+    event, occurrence = get_occurrence(event_id, *args, timezone=timezone, **kwargs)
     back_url = request.META.get('HTTP_REFERER', None)
     context = {
         'event': event,
@@ -157,7 +160,8 @@ def edit_occurrence(request, event_id,
                     template_name="schedule/edit_occurrence.html",
                     *args, **kwargs):
     extra_context = kwargs.get('extra_context', None) or {}
-    event, occurrence = get_occurrence(event_id, *args, **kwargs)
+    timezone = request.GET.get('timezone', pytz.utc)
+    event, occurrence = get_occurrence(event_id, *args, timezone=timezone, **kwargs)
     next = kwargs.get('next', None)
     form = OccurrenceForm(data=request.POST or None, instance=occurrence)
     if form.is_valid():
@@ -186,7 +190,8 @@ def cancel_occurrence(request, event_id,
     conformation to cancel.
     """
     extra_context = kwargs.get('extra_context', None) or {}
-    event, occurrence = get_occurrence(event_id, *args, **kwargs)
+    timezone = request.GET.get('timezone', pytz.utc)
+    event, occurrence = get_occurrence(event_id, *args, timezone=timezone, **kwargs)
     next = kwargs.get('next', None) or get_next_url(request, event.get_absolute_url())
     if request.method != "POST":
         context = {
@@ -200,7 +205,7 @@ def cancel_occurrence(request, event_id,
 
 
 def get_occurrence(event_id, occurrence_id=None, year=None, month=None,
-                   day=None, hour=None, minute=None, second=None):
+                   day=None, hour=None, minute=None, second=None, timezone=pytz.utc):
     """
     Because occurrences don't have to be persisted, there must be two ways to
     retrieve them. both need an event, but if its persisted the occurrence can
@@ -214,7 +219,7 @@ def get_occurrence(event_id, occurrence_id=None, year=None, month=None,
     elif not [x for x in (year, month, day, hour, minute, second) if x is None]:
         event = get_object_or_404(Event, id=event_id)
         date = datetime.datetime(int(year), int(month), int(day), int(hour),
-                                 int(minute), int(second))
+                                 int(minute), int(second), tzinfo=timezone)
         occurrence = event.get_occurrence(date)
         if occurrence is None:
             raise Http404
@@ -260,10 +265,11 @@ def create_or_edit_event(request, calendar_slug, event_id=None, next=None,
     """
     extra_context = extra_context or {}
     date = coerce_date_dict(request.GET)
+    tzinfo = request.session.get('django_timezone', pytz.utc)
     initial_data = None
     if date:
         try:
-            start = datetime.datetime(**date)
+            start = datetime.datetime(tzinfo=tzinfo, **date)
             initial_data = {
                 "start": start,
                 "end": start + datetime.timedelta(minutes=30)
@@ -356,14 +362,15 @@ def calendar_by_periods_json(request, calendar_slug, periods):
     # it conforms with the standard API structure but in this case it is rather cryptic
     user = request.user
     calendar = get_object_or_404(Calendar, slug=calendar_slug)
+    tzinfo = request.session.get('django_timezone', pytz.utc)
     date = coerce_date_dict(request.GET)
     if date:
         try:
-            date = datetime.datetime(**date)
+            date = datetime.datetime(tzinfo=tzinfo, **date)
         except ValueError:
             raise Http404
     else:
-        date = datetime.datetime.now()
+        date = timezone.now()
     event_list = GET_EVENTS_FUNC(request, calendar)
     period_object = periods[0](event_list, date)
     occurrences = []
@@ -380,7 +387,8 @@ def ajax_edit_occurrence_by_code(request):
         id = request.REQUEST.get('id')
         kwargs = decode_occurrence(id)
         event_id = kwargs.pop('event_id')
-        event, occurrence = get_occurrence(event_id, **kwargs)
+        timezone = request.GET.get('timezone', pytz.utc)
+        event, occurrence = get_occurrence(event_id, timezone=timezone, **kwargs)
         if request.REQUEST.get('action') == 'cancel':
             occurrence.cancel()
             return HttpResponse(serialize_occurrences(request, [occurrence], request.user))

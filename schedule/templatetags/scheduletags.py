@@ -62,7 +62,9 @@ def daily_table(context, day, width, width_slot, height, start=8, end=20, increm
     user = context['request'].user
     context['addable'] = CHECK_PERMISSION_FUNC(None, user)
     width_occ = width - width_slot
-    day_part = day.get_time_slot(day.start + datetime.timedelta(hours=start), day.start + datetime.timedelta(hours=end))
+    start = day.start + datetime.timedelta(hours=start)
+    end = day.start + datetime.timedelta(hours=end)
+    day_part = day.get_time_slot(start, end)
     occurrences = day_part.get_occurrences()
     occurrences = _cook_occurrences(day_part, occurrences, width_occ, height)
     # get slots to display on the left

@@ -38,6 +38,9 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
+# If you set this to False, Django will not use timezone-aware datetimes.
+USE_TZ = True
+
 STATIC_ROOT = os.path.join(PROJECT_DIR, "static")
 STATIC_URL = "/static/"
 

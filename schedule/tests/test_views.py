@@ -1,5 +1,6 @@
 import os
 import datetime
+import pytz
 
 from django.core.urlresolvers import reverse
 from django.test import Client, TestCase
@@ -40,7 +41,7 @@ class TestViewUtils(TestCase):
         self.assertEqual(date_dict, expected)
 
     def test_coerce_date_dict_missing_values(self):
-        date_dict = coerce_date_dict({'year': '2008', 'month': '4', 'hours': '3'}),
+        date_dict = coerce_date_dict({'year': '2008', 'month': '4', 'hours': '3'})
         expected = {'year': 2008, 'month': 4, 'day': 1, 'hour': 0, 'minute': 0, 'second': 0}
         self.assertEqual(date_dict, expected)
 
@@ -63,8 +64,11 @@ class TestUrls(TestCase):
         self.assertEqual(self.response.status_code, 200)
         self.assertEqual(self.response.context[0]["calendar"].name, "Example Calendar")
         month = self.response.context[0]["periods"]['month']
-        self.assertEqual((month.start, month.end),
-                         (datetime.datetime(2000, 11, 1, 0, 0), datetime.datetime(2000, 12, 1, 0, 0)))
+        expected = (
+            datetime.datetime(2000, 11, 1, 0, 0, tzinfo=pytz.utc),
+            datetime.datetime(2000, 12, 1, 0, 0, tzinfo=pytz.utc)
+        )
+        self.assertEqual((month.start, month.end), expected)
 
     def test_event_creation_anonymous_user(self):
         url = reverse("calendar_create_event", kwargs={"calendar_slug": 'example'})

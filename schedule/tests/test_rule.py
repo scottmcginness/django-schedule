@@ -1,5 +1,6 @@
 import datetime
 import os
+import pytz
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -65,14 +66,14 @@ class TestRule(TestCase):
         cal = Calendar.objects.get(name="MyCal")
         recurring_data = {
             'title': 'Recent Event',
-            'start': datetime.datetime(2010, 1, 1, 8, 0),
-            'end': datetime.datetime(2010, 1, 1, 9, 0),
-            'end_recurring_period': datetime.datetime(2010, 2, 1, 0, 0),
+            'start': datetime.datetime(2010, 1, 1, 8, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2010, 1, 1, 9, 0, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2010, 2, 1, 0, 0, tzinfo=pytz.utc),
             'rule': rule,
             'calendar': cal
         }
         recurring_event = Event(**recurring_data)
-        start = datetime.datetime(2010, 1, 1, 0, 0)
-        end = datetime.datetime(2010, 2, 1, 0, 0)
+        start = datetime.datetime(2010, 1, 1, 0, 0, tzinfo=pytz.utc)
+        end = datetime.datetime(2010, 2, 1, 0, 0, tzinfo=pytz.utc)
         occurrences = recurring_event.get_occurrences(start=start, end=end)
         return [o.start.day for o in occurrences]

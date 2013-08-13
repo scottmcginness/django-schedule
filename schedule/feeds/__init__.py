@@ -2,6 +2,7 @@ from schedule.models import Calendar
 from django.contrib.syndication.feeds import FeedDoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
+from django.utils import timezone
 
 from schedule.models import Calendar
 from schedule.feeds.atom import Feed
@@ -25,7 +26,7 @@ class UpcomingEventsFeed(Feed):
         return obj.get_absolute_url()
 
     def items(self, obj):
-        occs = obj.occurrences_after(datetime.datetime.now())
+        occs = obj.occurrences_after(timezone.now())
         length = getattr(settings, "FEED_LIST_LENGTH", 10)
         return itertools.islice(occs, length)
 

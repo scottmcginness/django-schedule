@@ -1,5 +1,6 @@
 import datetime
 import os
+import pytz
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -17,48 +18,48 @@ class TestEvent(TestCase):
         cal.save()
         self.recurring_data = {
             'title': 'Recent Event',
-            'start': datetime.datetime(2008, 1, 5, 8, 0),
-            'end': datetime.datetime(2008, 1, 5, 9, 0),
-            'end_recurring_period': datetime.datetime(2008, 5, 5, 0, 0),
+            'start': datetime.datetime(2008, 1, 5, 8, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2008, 1, 5, 9, 0, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2008, 5, 5, 0, 0, tzinfo=pytz.utc),
             'rule': rule,
             'calendar': cal
         }
         self.data = {
             'title': 'Recent Event',
-            'start': datetime.datetime(2008, 1, 5, 8, 0),
-            'end': datetime.datetime(2008, 1, 5, 9, 0),
-            'end_recurring_period': datetime.datetime(2008, 5, 5, 0, 0),
+            'start': datetime.datetime(2008, 1, 5, 8, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2008, 1, 5, 9, 0, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2008, 5, 5, 0, 0, tzinfo=pytz.utc),
             'calendar': cal
         }
 
     def test_recurring_event_get_occurrences(self):
         recurring_event = Event(**self.recurring_data)
-        start = datetime.datetime(2008, 1, 12, 0, 0)
-        end = datetime.datetime(2008, 1, 20, 0, 0)
+        start = datetime.datetime(2008, 1, 12, 0, 0, tzinfo=pytz.utc)
+        end = datetime.datetime(2008, 1, 20, 0, 0, tzinfo=pytz.utc)
         occurrences = recurring_event.get_occurrences(start=start, end=end)
         expected = [
-            '2008-01-12 08:00:00 to 2008-01-12 09:00:00',
-            '2008-01-19 08:00:00 to 2008-01-19 09:00:00',
+            '2008-01-12 08:00:00+00:00 to 2008-01-12 09:00:00+00:00',
+            '2008-01-19 08:00:00+00:00 to 2008-01-19 09:00:00+00:00',
         ]
         self.assertEquals(["%s to %s" % (o.start, o.end) for o in occurrences], expected)
 
     def test_event_get_occurrences_after(self):
         recurring_event = Event(**self.recurring_data)
         recurring_event.save()
-        start = datetime.datetime(2008, 1, 5)
-        end = datetime.datetime(2008, 1, 6)
+        start = datetime.datetime(2008, 1, 5, tzinfo=pytz.utc)
+        end = datetime.datetime(2008, 1, 6, tzinfo=pytz.utc)
         occurrences = recurring_event.get_occurrences(start=start, end=end)
         occurrence = occurrences[0]
-        occurrence2 = recurring_event.occurrences_after(start.next())
+        occurrence2 = recurring_event.occurrences_after(start).next()
         self.assertEqual(occurrence, occurrence2)
 
     def test_get_occurrence(self):
         event = Event(**self.recurring_data)
         event.save()
-        occurrence = event.get_occurrence(datetime.datetime(2008, 1, 5, 8, 0))
-        self.assertEqual(occurrence.start, datetime.datetime(2008, 1, 5, 8))
+        occurrence = event.get_occurrence(datetime.datetime(2008, 1, 5, 8, 0, tzinfo=pytz.utc))
+        self.assertEqual(occurrence.start, datetime.datetime(2008, 1, 5, 8, tzinfo=pytz.utc))
         occurrence.save()
-        occurrence = event.get_occurrence(datetime.datetime(2008, 1, 5, 8, 0))
+        occurrence = event.get_occurrence(datetime.datetime(2008, 1, 5, 8, 0, tzinfo=pytz.utc))
         self.assertTrue(occurrence.pk is not None)
 
 
@@ -70,23 +71,23 @@ class TestOccurrence(TestCase):
         cal.save()
         self.recurring_data = {
             'title': 'Recent Event',
-            'start': datetime.datetime(2008, 1, 5, 8, 0),
-            'end': datetime.datetime(2008, 1, 5, 9, 0),
-            'end_recurring_period': datetime.datetime(2008, 5, 5, 0, 0),
+            'start': datetime.datetime(2008, 1, 5, 8, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2008, 1, 5, 9, 0, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2008, 5, 5, 0, 0, tzinfo=pytz.utc),
             'rule': rule,
             'calendar': cal
         }
         self.data = {
             'title': 'Recent Event',
-            'start': datetime.datetime(2008, 1, 5, 8, 0),
-            'end': datetime.datetime(2008, 1, 5, 9, 0),
-            'end_recurring_period': datetime.datetime(2008, 5, 5, 0, 0),
+            'start': datetime.datetime(2008, 1, 5, 8, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2008, 1, 5, 9, 0, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2008, 5, 5, 0, 0, tzinfo=pytz.utc),
             'calendar': cal
         }
         self.recurring_event = Event(**self.recurring_data)
         self.recurring_event.save()
-        self.start = datetime.datetime(2008, 1, 12, 0, 0)
-        self.end = datetime.datetime(2008, 1, 27, 0, 0)
+        self.start = datetime.datetime(2008, 1, 12, 0, 0, tzinfo=pytz.utc)
+        self.end = datetime.datetime(2008, 1, 27, 0, 0, tzinfo=pytz.utc)
 
     def test_presisted_occurrences(self):
         occurrences = self.recurring_event.get_occurrences(start=self.start, end=self.end)
@@ -121,7 +122,7 @@ class TestOccurrence(TestCase):
         # leaving an "orphaned" occurrence
         occurrences = self.recurring_event.get_occurrences(start=self.start, end=self.end)
         self.assertTrue(len(occurrences) == 3)
-        self.recurring_event.start = datetime.datetime(2008, 1, 5, 8, 15)
+        self.recurring_event.start = datetime.datetime(2008, 1, 5, 8, 15, tzinfo=pytz.utc)
         self.recurring_event.save()
         occurrences_later = self.recurring_event.get_occurrences(start=self.start, end=self.end)
         self.assertEquals(len(occurrences_later), len(occurrences))
@@ -138,7 +139,7 @@ class TestOccurrence(TestCase):
         # trigger bug discovered by gautamadude
         occurrences = self.recurring_event.get_occurrences(start=self.start, end=self.end)
         self.assertTrue(len(occurrences) == 3)
-        self.recurring_event.start = datetime.datetime(2008, 1, 5, 8, 15)
+        self.recurring_event.start = datetime.datetime(2008, 1, 5, 8, 15, tzinfo=pytz.utc)
         self.recurring_event.save()
         occurrences_later = self.recurring_event.get_occurrences(start=self.start, end=self.end)
         self.assertEquals(len(occurrences_later), len(occurrences))

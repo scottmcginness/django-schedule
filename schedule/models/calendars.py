@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
-from dateutil import rrule
+import pytz
 
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
 from django.template.defaultfilters import slugify
+from django.utils import timezone
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 from schedule.utils import EventListManager
@@ -112,24 +113,24 @@ class Calendar(models.Model):
     >>> calendar.save()
     >>> data = {
     ...     'title': 'Recent Event',
-    ...     'start': datetime.datetime(2008, 1, 5, 0, 0),
-    ...     'end': datetime.datetime(2008, 1, 10, 0, 0)
+    ...     'start': datetime.datetime(2008, 1, 5, 0, 0, tzinfo=pytz.utc),
+    ...     'end': datetime.datetime(2008, 1, 10, 0, 0, tzinfo=pytz.utc)
     ... }
     >>> event = Event(**data)
     >>> event.save()
     >>> calendar.events.add(event)
     >>> data = {
     ...     'title': 'Upcoming Event',
-    ...     'start': datetime.datetime(2008, 1, 1, 0, 0),
-    ...     'end': datetime.datetime(2008, 1, 4, 0, 0)
+    ...     'start': datetime.datetime(2008, 1, 1, 0, 0, tzinfo=pytz.utc),
+    ...     'end': datetime.datetime(2008, 1, 4, 0, 0, tzinfo=pytz.utc)
     ... }
     >>> event = Event(**data)
     >>> event.save()
     >>> calendar.events.add(event)
     >>> data = {
     ...     'title': 'Current Event',
-    ...     'start': datetime.datetime(2008, 1, 3),
-    ...     'end': datetime.datetime(2008, 1, 6)
+    ...     'start': datetime.datetime(2008, 1, 3, tzinfo=pytz.utc),
+    ...     'end': datetime.datetime(2008, 1, 6, tzinfo=pytz.utc)
     ... }
     >>> event = Event(**data)
     >>> event.save()
@@ -160,7 +161,7 @@ class Calendar(models.Model):
         """
         CalendarRelation.objects.create_relation(self, obj, distinction, inheritable)
 
-    def get_recent(self, amount=5, in_datetime=datetime.datetime.now):
+    def get_recent(self, amount=5, in_datetime=timezone.now):
         """
         This shortcut function allows you to get events that have started
         recently.
@@ -169,9 +170,11 @@ class Calendar(models.Model):
         5.
 
         in_datetime is the datetime you want to check against.  It defaults to
-        datetime.datetime.now
+        timezone.now()
         """
-        return self.events.order_by('-start').filter(start__lt=datetime.datetime.now())[:amount]
+        if callable(in_datetime):
+            in_datetime = in_datetime()
+        return self.events.order_by('-start').filter(start__lt=in_datetime)[:amount]
 
     def occurrences_after(self, date=None):
         return EventListManager(self.events.all()).occurrences_after(date)

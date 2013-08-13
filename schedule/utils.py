@@ -1,10 +1,12 @@
 import datetime
 import heapq
+import pytz
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
 from django.template import Context, loader
+from django.utils import timezone
 
 from schedule.conf.settings import CHECK_PERMISSION_FUNC
 
@@ -29,7 +31,7 @@ class EventListManager(object):
         """
         from schedule.models import Occurrence
         if after is None:
-            after = datetime.datetime.now()
+            after = timezone.now()
 
         occurrences = Occurrence.objects.filter(event__in=self.events)
         occ_replacer = OccurrenceReplacer(occurrences)

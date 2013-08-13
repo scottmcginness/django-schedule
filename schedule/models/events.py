@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 from dateutil import rrule
+import pytz
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -9,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
 from django.template.defaultfilters import date
+from django.utils import timezone
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 from schedule.models.rules import Rule
@@ -49,7 +51,7 @@ class Event(models.Model):
     title = models.CharField(_("title"), max_length=255)
     description = models.TextField(_("description"), null=True, blank=True)
     creator = models.ForeignKey(User, null=True, verbose_name=_("creator"))
-    created_on = models.DateTimeField(_("created on"), default=datetime.datetime.now)
+    created_on = models.DateTimeField(_("created on"), default=timezone.now)
     rule = models.ForeignKey(Rule, null=True, blank=True, verbose_name=_("rule"), help_text=_("Select '----' for a one time only event."))
     end_recurring_period = models.DateTimeField(_("end recurring period"), null=True, blank=True, help_text=_("This date is ignored for one time only events."))
     priority = models.IntegerField(_("priority"), null=True, blank=True)
@@ -97,18 +99,22 @@ class Event(models.Model):
         """
         >>> rule = Rule(frequency="MONTHLY", name="Monthly")
         >>> rule.save()
-        >>> event = Event(rule=rule, start=datetime.datetime(2008,1,1), end=datetime.datetime(2008,1,2))
+        >>> event = Event(rule=rule, start=datetime.datetime(2008, 1, 1, tzinfo=pytz.utc),
+        ...         end=datetime.datetime(2008, 1, 2, tzinfo=pytz.utc))
         >>> event.rule
         <Rule: Monthly>
-        >>> occurrences = event.get_occurrences(datetime.datetime(2008,1,24), datetime.datetime(2008,3,2))
-        >>> ["%s to %s" %(o.start, o.end) for o in occurrences]
-        ['2008-02-01 00:00:00 to 2008-02-02 00:00:00', '2008-03-01 00:00:00 to 2008-03-02 00:00:00']
+        >>> occurrences = event.get_occurrences(datetime.datetime(2008, 1, 24, tzinfo=pytz.utc),
+        ...         datetime.datetime(2008, 3, 2, tzinfo=pytz.utc))
+        >>> ["%s to %s" % (o.start, o.end) for o in occurrences]
+        ['2008-02-01 00:00:00+00:00 to 2008-02-02 00:00:00+00:00', '2008-03-01 00:00:00+00:00 to 2008-03-02 00:00:00+00:00']
 
         Ensure that if an event has no rule, that it appears only once.
 
-        >>> event = Event(start=datetime.datetime(2008,1,1,8,0), end=datetime.datetime(2008,1,1,9,0))
-        >>> occurrences = event.get_occurrences(datetime.datetime(2008,1,24), datetime.datetime(2008,3,2))
-        >>> ["%s to %s" %(o.start, o.end) for o in occurrences]
+        >>> event = Event(start=datetime.datetime(2008, 1, 1, 8, 0, tzinfo=pytz.utc),
+        ...         end=datetime.datetime(2008, 1, 1, 9, 0, tzinfo=pytz.utc))
+        >>> occurrences = event.get_occurrences(datetime.datetime(2008, 1, 24, tzinfo=pytz.utc),
+        ...         datetime.datetime(2008, 3, 2, tzinfo=pytz.utc))
+        >>> ["%s to %s" % (o.start, o.end) for o in occurrences]
         []
 
         """
@@ -142,6 +148,8 @@ class Event(models.Model):
         return Occurrence(event=self, start=start, end=end, original_start=start, original_end=end)
 
     def get_occurrence(self, date):
+        if timezone.is_naive(date):
+            date - timezone.make_aware(date, pytz.utc)
         rule = self.get_rrule_object()
         if rule:
             next_occurrence = rule.after(date, inc=True)
@@ -182,7 +190,7 @@ class Event(models.Model):
         """
 
         if after is None:
-            after = datetime.datetime.now()
+            after = timezone.now()
         rule = self.get_rrule_object()
         if rule is None:
             if self.end > after:
@@ -220,8 +228,8 @@ class EventRelationManager(models.Manager):
     >>> CalendarRelation.objects.all().delete()
     >>> data = {
     ...     'title': 'Test1',
-    ...     'start': datetime.datetime(2008, 1, 1),
-    ...     'end': datetime.datetime(2008, 1, 11)
+    ...     'start': datetime.datetime(2008, 1, 1, tzinfo=pytz.utc),
+    ...     'end': datetime.datetime(2008, 1, 11, tzinfo=pytz.utc)
     ... }
     >>> Event.objects.all().delete()
     >>> event1 = Event(**data)

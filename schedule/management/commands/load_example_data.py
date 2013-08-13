@@ -1,3 +1,4 @@
+import pytz
 from django.core.management.base import NoArgsCommand
 from django.core.management.color import no_style
 
@@ -46,9 +47,9 @@ class Command(NoArgsCommand):
         rule = Rule.objects.get(frequency="WEEKLY")
         data = {
             'title': 'Exercise',
-            'start': datetime.datetime(2008, 11, 3, 8, 0),
-            'end': datetime.datetime(2008, 11, 3, 9, 0),
-            'end_recurring_period': datetime.datetime(2009, 6, 1, 0, 0),
+            'start': datetime.datetime(2008, 11, 3, 8, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2008, 11, 3, 9, 0, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2009, 6, 1, 0, 0, tzinfo=pytz.utc),
             'rule': rule,
             'calendar': cal
         }
@@ -57,9 +58,9 @@ class Command(NoArgsCommand):
 
         data = {
             'title': 'Exercise',
-            'start': datetime.datetime(2008, 11, 5, 15, 0),
-            'end': datetime.datetime(2008, 11, 5, 16, 30),
-            'end_recurring_period': datetime.datetime(2009, 6, 1, 0, 0),
+            'start': datetime.datetime(2008, 11, 5, 15, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2008, 11, 5, 16, 30, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2009, 6, 1, 0, 0, tzinfo=pytz.utc),
             'rule': rule,
             'calendar': cal
         }
@@ -68,9 +69,9 @@ class Command(NoArgsCommand):
 
         data = {
             'title': 'Exercise',
-            'start': datetime.datetime(2008, 11, 7, 8, 0),
-            'end': datetime.datetime(2008, 11, 7, 9, 30),
-            'end_recurring_period': datetime.datetime(2009, 6, 1, 0, 0),
+            'start': datetime.datetime(2008, 11, 7, 8, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2008, 11, 7, 9, 30, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2009, 6, 1, 0, 0, tzinfo=pytz.utc),
             'rule': rule,
             'calendar': cal
         }
@@ -80,9 +81,9 @@ class Command(NoArgsCommand):
         rule = Rule.objects.get(frequency="MONTHLY")
         data = {
             'title': 'Pay Mortgage',
-            'start': datetime.datetime(2008, 11, 1, 14, 0),
-            'end': datetime.datetime(2008, 11, 1, 14, 30),
-            'end_recurring_period': datetime.datetime(2009, 10, 2, 0, 0),
+            'start': datetime.datetime(2008, 11, 1, 14, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2008, 11, 1, 14, 30, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2009, 10, 2, 0, 0, tzinfo=pytz.utc),
             'rule': rule,
             'calendar': cal
         }
@@ -92,9 +93,9 @@ class Command(NoArgsCommand):
         rule = Rule.objects.get(frequency="YEARLY")
         data = {
             'title': "Rock's Birthday Party",
-            'start': datetime.datetime(2008, 12, 11, 19, 0),
-            'end': datetime.datetime(2008, 12, 11, 23, 59),
-            'end_recurring_period': datetime.datetime(2009, 12, 22, 0, 0),
+            'start': datetime.datetime(2008, 12, 11, 19, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2008, 12, 11, 23, 59, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2009, 12, 22, 0, 0, tzinfo=pytz.utc),
             'rule': rule,
             'calendar': cal
         }
@@ -103,9 +104,9 @@ class Command(NoArgsCommand):
 
         data = {
             'title': 'Christmas Party',
-            'start': datetime.datetime(2008, 12, 25, 19, 30),
-            'end': datetime.datetime(2008, 12, 25, 23, 59),
-            'end_recurring_period': datetime.datetime(2010, 12, 31, 0, 0),
+            'start': datetime.datetime(2008, 12, 25, 19, 30, tzinfo=pytz.utc),
+            'end': datetime.datetime(2008, 12, 25, 23, 59, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2010, 12, 31, 0, 0, tzinfo=pytz.utc),
             'rule': rule,
             'calendar': cal
         }
@@ -114,9 +115,9 @@ class Command(NoArgsCommand):
 
         data = {
             'title': 'New Pinax site goes live',
-            'start': datetime.datetime(2009, 1, 6, 11, 0),
-            'end': datetime.datetime(2009, 1, 6, 12, 00),
-            'end_recurring_period': datetime.datetime(2009, 1, 7, 0, 0),
+            'start': datetime.datetime(2009, 1, 6, 11, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2009, 1, 6, 12, 00, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2009, 1, 7, 0, 0, tzinfo=pytz.utc),
             'calendar': cal
         }
         event = Event(**data)
