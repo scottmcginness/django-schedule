@@ -5,11 +5,11 @@ from setuptools import setup, find_packages
 
 dateutil = 'python-dateutil'
 if sys.version_info < (3, 0):
-    dateutil = 'python-dateutil==1.5'
+    dateutil = 'python-dateutil==2.1'
 
 setup(
     name='django-schedule',
-    version='0.6b',
+    version='0.7',
     description='A calendaring app for Django.',
     author='Anthony Robert Hauber',
     author_email='thauber@gmail.com',
