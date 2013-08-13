@@ -1,8 +1,10 @@
 {% extends "schedule/base.html" %}
+{% load staticfiles %}
+{% load staticfiles %}
 
 {% block extra_head %}
   {{ block.super }}
-  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.timePicker.js"></script>
+  <script type="text/javascript" src="{% static "js/jquery.timePicker.js" %}"></script>
   <script type="text/javascript">
     $(function() {
         $("#id_start_0").datepicker({dateFormat: $.datepicker.ATOM});
