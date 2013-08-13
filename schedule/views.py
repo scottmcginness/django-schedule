@@ -7,8 +7,9 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context, loader
-from django.views.generic.create_update import delete_object
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.generic.edit import DeleteView
 
 from schedule.conf.settings import GET_EVENTS_FUNC, OCCURRENCE_CANCEL_REDIRECT
 from schedule.forms import (EventForm, OccurrenceForm,
@@ -308,26 +309,22 @@ def create_or_edit_event(request, calendar_slug, event_id=None, next=None,
     return render_to_response(template_name, context, context_instance=RequestContext(request))
 
 
-@check_event_permissions
-def delete_event(request, event_id, next=None, login_required=True, extra_context=None):
-    """
-    After the event is deleted there are three options for redirect, tried in
-    this order:
+class EventDeleteView(DeleteView):
+    model = Event
+    template_name="schedule/delete_event.html"
 
-    # Try to find a 'next' GET variable
-    # If the key word argument redirect is set
-    # Lastly redirect to the event detail of the recently create event
-    """
-    extra_context = extra_context or {}
-    event = get_object_or_404(Event, id=event_id)
-    next = next or reverse('day_calendar', args=[event.calendar.slug])
-    next = get_next_url(request, next)
-    extra_context['next'] = next
-    return delete_object(request, model=Event, object_id=event_id,
-                         post_delete_redirect=next,
-                         template_name="schedule/delete_event.html",
-                         extra_context=extra_context,
-                         login_required=login_required)
+    def get_success_url(self):
+        next = reverse('day_calendar', args=[self.calendar.slug])
+        return get_next_url(self.request, next)
+
+    @method_decorator(check_event_permissions)
+    def dispatch(self, request, *args, **kwargs):
+        return super(EventDeleteView, self).dispatch(request, *args, **kwargs)
+
+    def get_object(self, *args, **kwargs):
+        event = super(EventDeleteView, self).get_object(*args, **kwargs)
+        self.calendar = event.calendar  # Store calendar for access in get_success_url
+        return event
 
 
 def check_next_url(next):
@@ -377,7 +374,7 @@ def calendar_by_periods_json(request, calendar_slug, periods):
     for o in period_object.occurrences:
         if period_object.classify_occurrence(o):
             occurrences.append(o)
-    resp = serialize_occurrences_func(request, occurrences, user)
+    resp = serialize_occurrences(request, occurrences, user)
     return HttpResponse(resp)
 
 

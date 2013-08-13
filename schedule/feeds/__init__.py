@@ -1,5 +1,5 @@
 from schedule.models import Calendar
-from django.contrib.syndication.feeds import FeedDoesNotExist
+from django.contrib.syndication.views import FeedDoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.utils import timezone

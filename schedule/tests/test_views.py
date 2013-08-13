@@ -112,21 +112,21 @@ class TestUrls(TestCase):
 
     def test_delete_event_anonymous_user(self):
         # Only logged-in users should be able to delete, so we're redirected
-        self.response = c.get(reverse("delete_event", kwargs={"event_id": 1}), {})
+        self.response = c.get(reverse("delete_event", kwargs={"pk": 1}), {})
         self.assertEqual(self.response.status_code, 302)
 
     def test_delete_event_authenticated_user(self):
         c.login(username="admin", password="admin")
 
         # Load the deletion page
-        self.response = c.get(reverse("delete_event", kwargs={"event_id": 1}), {})
+        self.response = c.get(reverse("delete_event", kwargs={"pk": 1}), {})
         self.assertEqual(self.response.status_code, 200)
 
         # Delete the event
-        self.response = c.post(reverse("delete_event", kwargs={"event_id": 1}), {})
+        self.response = c.post(reverse("delete_event", kwargs={"pk": 1}), {})
         self.assertEqual(self.response.status_code, 302)
 
         # Since the event is now deleted, we get a 404
-        self.response = c.get(reverse("delete_event", kwargs={"event_id": 1}), {})
+        self.response = c.get(reverse("delete_event", kwargs={"pk": 1}), {})
         self.assertEqual(self.response.status_code, 404)
         c.logout()

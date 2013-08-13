@@ -1,20 +1,20 @@
-from django.conf.urls.defaults import *
-from django.views.generic.list_detail import object_list
+from django.conf.urls import *
+from django.views.generic.list import ListView
 
 from schedule.feeds import UpcomingEventsFeed, CalendarICalendar
 from schedule.models import Calendar
 from schedule.feeds import UpcomingEventsFeed
 from schedule.feeds import CalendarICalendar
 from schedule.periods import Decade, Year, Month, Week, Day
+from schedule.views import EventDeleteView
 
 urlpatterns = patterns('')
 
 # Calendar URLs
 urlpatterns += patterns('',
-    url(r'^calendar/$', object_list, name="schedule",
-        kwargs={
-            'queryset': Calendar.objects.all(),
-            'template_name': 'schedule/calendar_list.html'}),
+    url(r'^calendar/$', ListView.as_view(queryset=Calendar.objects.all(),
+                                         template_name='schedule/calendar_list.html'),
+        name="schedule"),
 
     url(r'^calendar/decade/(?P<calendar_slug>[-\w]+)/$',
         'schedule.views.calendar_by_periods', name="decade_calendar",
@@ -81,9 +81,10 @@ urlpatterns += patterns('',
         'schedule.views.event',
         name="event"),
 
-    url(r'^event/delete/(?P<event_id>\d+)/$',
-        'schedule.views.delete_event',
+    url(r'^event/delete/(?P<pk>\d+)/$',
+        EventDeleteView.as_view(),
         name="delete_event"),
+
 )
 
 # Persisted occurrence URLs
@@ -124,7 +125,7 @@ urlpatterns += patterns('',
 # Feed URLs
 urlpatterns += patterns('',
     url(r'^feed/calendar/(.*)/$',
-        'django.contrib.syndication.views.feed',
+        'django.contrib.syndication.views.Feed',
         {"feed_dict": {"upcoming": UpcomingEventsFeed}}),
 
     url(r'^ical/calendar/(.*)/$', CalendarICalendar()),
@@ -149,7 +150,6 @@ urlpatterns += patterns('',
         'schedule.views.event_json',
         name="event_json"),
 
-    url(r'^$', object_list,
-        {'queryset': Calendar.objects.all()},
+    url(r'^$', ListView.as_view(queryset=Calendar.objects.all()),
         name='schedule'),
 )
