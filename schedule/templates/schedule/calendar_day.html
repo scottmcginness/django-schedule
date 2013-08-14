@@ -22,9 +22,6 @@
     </a>
   </div>
   <div class="tablewrapper">
-    <div class="calendarname">
-      {{ calendar.name }}
-    </div>
     {% prevnext "day_calendar" calendar.slug periods.day "jS M" %}
     <div class="now">
       <a href="{% url 'day_calendar' calendar.slug %}">

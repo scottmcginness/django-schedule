@@ -3,35 +3,16 @@
 
 {% block content %}
   <div class="tablewrapper">
-    <div class="calendarname">
-      {{ calendar.name }}
-    </div>
     {% prevnext "year_calendar" calendar.slug periods.year "Y" %}
-    <table align="center">
-      <tr>
+    <div class="container">
+      <div class="row">
         {% for month in periods.year.get_months %}
-          <td valign="top">
-            <a href="{% url 'month_calendar' calendar.slug %}{% querystring_for_date month.start 2 %}">
-              {{ month.name }}
-            </a>
+          <div class="span-4">
             {% month_table calendar month "small" %}
-          </td>
-          <td width="12">&nbsp;</td>
-          {% ifequal forloop.counter 3  %}
-            </tr>
-            <tr>
-          {% endifequal %}
-          {% ifequal forloop.counter 6  %}
-            </tr>
-            <tr>
-          {% endifequal %}
-          {% ifequal forloop.counter  9 %}
-            </tr>
-            <tr>
-          {% endifequal %}
+          </div>
         {% endfor %}
-      </tr>
-    </table>
+      </div>
+    </div>
   </div>
 
   <div class="navigation">

@@ -3,26 +3,19 @@
 
 {% block content %}
   <div class="tablewrapper">
-    <div class="calendarname">
-      {{ calendar.name }}
-    </div>
     {% prevnext "tri_month_calendar" calendar.slug periods.month "F Y"%}
     <div class="now">
       <a href="{% url 'tri_month_calendar' calendar.slug %}">
         This month
       </a>
     </div>
-    <table align="center">
-      <tbody>
-        <tr>
-          <td valign="top">{% month_table calendar periods.month "small" -1 %}</td>
-          <td width="12">&nbsp;</td>
-          <td valign="top">{% month_table calendar periods.month "small" %}</td>
-          <td width="12">&nbsp;</td>
-          <td valign="top">{% month_table calendar periods.month "small" +1 %}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="container">
+        <div class="row">
+            <div class="span-4">{% month_table calendar periods.month "small" -1 %}</div>
+            <div class="span-4">{% month_table calendar periods.month "small" %}</div>
+            <div class="span-4">{% month_table calendar periods.month "small" +1 %}</div>
+        </div>
+    </div>
   </div>
 
   <div class="navigation">

@@ -3,6 +3,7 @@ import datetime
 from django import template
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from django.utils.dateformat import format
 
 from schedule.conf.settings import CHECK_PERMISSION_FUNC
@@ -355,3 +356,27 @@ def rule_select(name):
     for r in Rule.objects.order_by('name'):
         opts += '<option value="%s">%s</option>' % (r.id, r.name)
     return s % (name, opts)
+
+@register.filter
+def table_event_margin(partial):
+    right, left = 0, 0
+    cls = partial['class']
+    if cls == 0 or cls == 1:  # Started on this day
+        hour = timezone.localtime(partial['occurrence'].start).hour
+        left = 100.0 * hour / 24
+    if cls == 1 or cls == 3:  # Finished on this day
+        hour = timezone.localtime(partial['occurrence'].end).hour
+        right = 100.0 * (24 - hour) / 24
+        return "margin: 0 {:.2f}px 0 {:.2f}px;".format(right, left)
+
+@register.filter
+def table_event_width(partial):
+    width = 1
+    cls = partial['class']
+    if cls == 0 or cls == 1:  # Started on this day
+        hour = timezone.localtime(partial['occurrence'].start).hour
+        width -= 100.0 * hour / 24
+    if cls == 1 or cls == 3:  # Finished on this day
+        hour = timezone.localtime(partial['occurrence'].end).hour
+        width -= 100.0 * (24 - hour) / 24
+    return "width: {:.2f}%;".format(width)

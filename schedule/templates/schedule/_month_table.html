@@ -1,17 +1,22 @@
 {% load scheduletags %}
 
-<table align="center" class="calendar">
+<table class="table table-bordered{% ifequal size "small" %} table-compact{% endifequal %}">
+  <caption>
+    <a href="{% url 'month_calendar' calendar.slug %}{% querystring_for_date month.start 2 %}">
+      {{ month.name }}
+    </a>
+  </caption>
   {% if day_names %}
     <tr class="daysofweek">
     <td>&nbsp;</td>
     {% for day_name in day_names %}
-      <td {% ifnotequal size "small" %}width='120'{% endifnotequal %}>
+      <td>
         {{ day_name }}
       </td>
     {% endfor %}
   {% endif %}
   {% for week in month.get_weeks %}
-    <tr>
+    <tr class="weeksofyear">
       <td>
         <a href="{% url 'week_calendar' calendar.slug %}{% querystring_for_date week.start %}">
             {{ week.start|date:"W" }}

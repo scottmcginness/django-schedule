@@ -41,6 +41,10 @@ div.occ_column div.cancelled .actions {
   display: none;
 }
 
+td.daynumber div.daycell {
+    height: 20px;
+}
+
 td.daynumber div.daycell .cancelled {
   background-color: inherit;
   color: gray;
@@ -125,9 +129,15 @@ table.calendar {
   text-align: center;
 }
 
-.daysofweek {
-  height: 20px;
+.table tr.daysofweek td {
   text-align: center;
+}
+
+.weeksofyear {
+    text-align: center;
+}
+.table tr.weeksofyear td {
+    vertical-align: middle;
 }
 
 table.calendar td {
@@ -163,11 +173,17 @@ td.daynumber {
   height: 50px;
 }
 
+.table td.daynumber {
+  vertical-align: middle;
+  width: 13%;
+  padding: 8px 0;
+}
+
 td.daynumber div.header {
   margin-bottom: 2px;
   padding-bottom: 1px;
   padding-top: 1px;
-  text-align: right;
+  text-align: center;
 }
 
 td.daynumber div.header a {
@@ -179,23 +195,30 @@ td.small div.header a {
 }
 
 td.daynumber div.eventcell {
-  background: #f0f0f0;
-  border: 1px dotted gray;
+  background-color: rgb(228, 82, 82);
   clear: both;
+  color: #eeeeee;
   cursor: pointer;
-  margin: 0 1px 3px 1px;
-  overflow: auto;
+  padding-left: 3px;
+  overflow: visible;
+  white-space: nowrap;
+  height: 100%;
 }
 
 td.daynumber div.starttime {
   float: left;
-  width: 40px;
+  padding-right: 0.5em;
 }
 
 td.daynumber div.eventdesc {
   float: left;
+  font-size: 80%;
   height: 100%;
   width: 75px;
+}
+
+td.daynumber div.title-wrap {
+    text-overflow: ellipsis;
 }
 
 /**** WEEK VIEW ****/
